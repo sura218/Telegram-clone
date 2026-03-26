@@ -1,18 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/Input";
-import Button from "@/components/ui/Button";
+import  Button  from "@/components/ui/Button";
+// CHANGED: import auth store and real signIn service
+import { useAuthStore } from "@/store/auth.store";
+import { signIn } from "@/services/auth.service";
 
 export default function LoginPage() {
   const router = useRouter();
+  // CHANGED: get user and setUser from auth store instead of local state
+  const { user, setUser } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  // CHANGED: redirect if already logged in
+  useEffect(() => {
+    if (user) router.replace("/chat");
+  }, [user]);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/chat");
+    setError("");
+    if (!email || !password) { setError("Please fill in all fields"); return; }
+    setLoading(true);
+    try {
+      // CHANGED: real signIn call to Firestore instead of just router.push
+      const session = await signIn(email, password);
+      setUser(session);
+      router.push("/chat");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,13 +54,31 @@ export default function LoginPage() {
 
         <div className="bg-white dark:bg-tg-dark-sidebar rounded-2xl shadow-xl p-6 space-y-4">
           <form onSubmit={handleLogin} className="space-y-4">
-            <Input type="email" label="Email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="you@example.com" leftIcon={<EnvelopeIcon className="w-4 h-4" />} />
-            <Input type="password" label="Password" value={password} onChange={e => setPassword(e.target.value)}
-              placeholder="••••••••" leftIcon={<LockClosedIcon className="w-4 h-4" />} />
-            <Button type="submit" className="w-full py-3">Sign In</Button>
+            <Input type="email" label="Email" value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              leftIcon={<EnvelopeIcon className="w-4 h-4" />} />
+            <Input type="password" label="Password" value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder="••••••••"
+              leftIcon={<LockClosedIcon className="w-4 h-4" />} />
+
+            {/* CHANGED: show real error from Firebase */}
+            {error && (
+              <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-xl border border-red-100">
+                {error}
+              </div>
+            )}
+
+            {/* CHANGED: loading state on button */}
+            <Button type="submit" className="w-full py-3" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+            </Button>
           </form>
-          <p className="text-center text-xs text-gray-400">This is a frontend demo — any input works</p>
+          <p className="text-center text-xs text-gray-400">
+            Don&apos;t have an account?{" "}
+            <a href="/signup" className="text-tg-blue hover:underline">Sign up</a>
+          </p>
         </div>
       </div>
     </div>

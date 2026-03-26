@@ -1,25 +1,21 @@
 "use client";
-import { useEffect, useState } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 import { Avatar } from "@/components/ui/Avatar";
-import { Chat } from "@/types";
+// CHANGED: now takes real User object instead of Chat object
+import { User } from "@/types";
 
 interface Props {
-  chat: Chat;
+  // CHANGED: otherUser is now a real User from Firestore
+  otherUser?: User;
   onBack?: () => void;
   showBack?: boolean;
+  isDark?: boolean;
 }
 
-export function ChatHeader({ chat, onBack, showBack }: Props) {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
-    check();
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
+export function ChatHeader({ otherUser, onBack, showBack, isDark }: Props) {
+  const name = otherUser?.displayName || "Chat";
+  // CHANGED: use real online status from Firestore
+  const isOnline = otherUser?.online ?? false;
 
   return (
     <div
@@ -30,21 +26,20 @@ export function ChatHeader({ chat, onBack, showBack }: Props) {
       }}
     >
       {showBack && (
-        <button
-          onClick={onBack}
-          className="p-1.5 rounded-lg transition md:hidden"
-          style={{ color: isDark ? "#9ca3af" : "#6b7280" }}
-        >
+        <button onClick={onBack} className="p-1.5 rounded-lg transition md:hidden"
+          style={{ color: isDark ? "#9ca3af" : "#6b7280" }}>
           <ArrowLeftIcon className="w-5 h-5" />
         </button>
       )}
-      <Avatar name={chat.participantName} size="sm" online={chat.participantOnline} />
+      {/* CHANGED: show real online dot */}
+      <Avatar name={name} size="sm" online={isOnline} />
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm" style={{ color: isDark ? "#ffffff" : "#111827" }}>
-          {chat.participantName}
+          {name}
         </p>
-        <p className="text-xs" style={{ color: chat.participantOnline ? "#2AABEE" : "#9ca3af" }}>
-          {chat.participantOnline ? "online" : "offline"}
+        {/* CHANGED: real online/offline status */}
+        <p className="text-xs" style={{ color: isOnline ? "#2AABEE" : "#9ca3af" }}>
+          {isOnline ? "online" : "offline"}
         </p>
       </div>
     </div>
