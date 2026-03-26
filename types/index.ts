@@ -1,5 +1,36 @@
 export interface User {
   id: string;
+  displayName: string;
+  email: string;
+  photoURL?: string;
+  online: boolean;
+  lastSeen: string;
+}
+
+export interface Message {
+  id: string;
+  senderId: string;
+  senderName: string;
+  text: string;
+  timestamp: Date;
+  seen: boolean;
+  deleted: boolean;
+}
+
+export interface Chat {
+  id: string;
+  participantId: string;
+  participantName: string;
+  participantOnline: boolean;
+  lastMessage: string;
+  lastMessageTime: Date;
+  unread: number;
+  messages: Message[];
+}
+
+
+/*export interface User {
+  id: string;
   email: string;
   password: string;
   displayName: string;
@@ -23,7 +54,7 @@ export interface UserSession {
 
 export interface Chat {
   id: string;
-  participants: string[];
+  participantId: string;
   participantEmails: string[];
   type: "private" | "group";
   lastMessage?: string;
@@ -56,4 +87,4 @@ export interface Settings {
   sound: boolean;
   enterToSend: boolean;
   showLastSeen: boolean;
-}
+}*/
