@@ -43,7 +43,7 @@ export function ContactItem({ chat, otherUser, currentUserId, isActive, onClick,
             {name}
           </span>
           {/* CHANGED: use real lastMessageTime */}
-          <span className="text-xs flex-shrink-0" style={{ color: isDark ? "#6b7280" : "#9ca3af" }}>
+          <span className="text-xs shrink-0" style={{ color: isDark ? "#6b7280" : "#9ca3af" }}>
             {chat.lastMessageTime ? formatChatTime(chat.lastMessageTime) : ""}
           </span>
         </div>

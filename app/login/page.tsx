@@ -4,20 +4,19 @@ import { useRouter } from "next/navigation";
 import { EnvelopeIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/Input";
 import  Button  from "@/components/ui/Button";
-// CHANGED: import auth store and real signIn service
 import { useAuthStore } from "@/store/auth.store";
 import { signIn } from "@/services/auth.service";
 
 export default function LoginPage() {
   const router = useRouter();
-  // CHANGED: get user and setUser from auth store instead of local state
+  // get user and setUser from auth store instead of local state
   const { user, setUser } = useAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // CHANGED: redirect if already logged in
+  // redirect if already logged in
   useEffect(() => {
     if (user) router.replace("/chat");
   }, [user]);
@@ -28,7 +27,7 @@ export default function LoginPage() {
     if (!email || !password) { setError("Please fill in all fields"); return; }
     setLoading(true);
     try {
-      // CHANGED: real signIn call to Firestore instead of just router.push
+      // real signIn call to Firestore instead of just router.push
       const session = await signIn(email, password);
       setUser(session);
       router.push("/chat");
@@ -40,7 +39,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-tg-blue/10 via-white to-blue-50 dark:from-tg-dark-bg dark:to-tg-dark-sidebar flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-tg-blue/10 via-white to-blue-50 dark:from-tg-dark-bg dark:to-tg-dark-sidebar flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <div className="w-20 h-20 rounded-full bg-tg-blue flex items-center justify-center shadow-lg mb-4">
@@ -63,12 +62,16 @@ export default function LoginPage() {
               placeholder="••••••••"
               leftIcon={<LockClosedIcon className="w-4 h-4" />} />
 
-            {/* CHANGED: show real error from Firebase */}
+            {/* show error from Firebase */}
             {error && (
               <div className="bg-red-50 text-red-600 text-sm px-4 py-2.5 rounded-xl border border-red-100">
                 {error}
               </div>
             )}
+            <p>Email: you@example.com</p>
+            <p>password: you@example.com</p>
+            <p>Email: me@example.com</p>
+            <p>password: me@example.com</p>
 
             {/* CHANGED: loading state on button */}
             <Button type="submit" className="w-full py-3" disabled={loading}>
