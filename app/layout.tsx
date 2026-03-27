@@ -4,6 +4,9 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Telegram clone",
   description: "Telegram website",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -13,9 +16,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>
-        {children}
-      </body>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              const s = JSON.parse(localStorage.getItem('tg_settings') || '{}');
+              const t = s.theme || 'system';
+              if (t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+              }
+            } catch(e) {}
+          `,
+        }} />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }
