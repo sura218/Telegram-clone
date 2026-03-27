@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/chat/Sidebar";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { Spinner } from "@/components/ui/Spinner";
-// CHANGED: use real stores and hooks instead of mock data
+
 import { useAuthStore } from "@/store/auth.store";
 import { useChatStore } from "@/store/chat.store";
 import { usePresence } from "@/hooks/usePresence";
@@ -12,24 +12,22 @@ import { useChats } from "@/hooks/useChats";
 
 export default function ChatPage() {
   const router = useRouter();
-  // CHANGED: get real user from auth store
   const { user, isLoading, initFromStorage } = useAuthStore();
-  // CHANGED: get real chats and activeChatId from chat store
   const { chats, activeChatId, setActiveChat } = useChatStore();
   const [showSidebar, setShowSidebar] = useState(true);
   const [isDark, setIsDark] = useState(false);
 
-  // CHANGED: init session from localStorage on mount
+
   useEffect(() => {
     initFromStorage();
   }, []);
 
-  // CHANGED: redirect to login if not authenticated
+
   useEffect(() => {
     if (!isLoading && !user) router.replace("/login");
   }, [user, isLoading]);
 
-  // Watch dark mode
+
   useEffect(() => {
     const check = () => setIsDark(document.documentElement.classList.contains("dark"));
     check();
@@ -38,13 +36,13 @@ export default function ChatPage() {
     return () => observer.disconnect();
   }, []);
 
-  // CHANGED: real presence system — sets online/offline in Firestore
+
   usePresence(user?.id);
 
-  // CHANGED: real-time chats subscription from Firestore
+  
   useChats();
 
-  // CHANGED: show spinner while loading session
+  
   if (isLoading) {
     return (
       <div className="h-screen flex items-center justify-center">
@@ -61,8 +59,8 @@ export default function ChatPage() {
       style={{ backgroundColor: isDark ? "#0F1C26" : "#ffffff" }}
     >
       {/* Sidebar */}
-      <div className={`flex-shrink-0 w-full md:w-80 lg:w-96 ${showSidebar ? "flex" : "hidden"} md:flex flex-col`}>
-        {/* CHANGED: Sidebar now gets real chats from store, not mock data */}
+      <div className={`shrink-0 w-full md:w-80 lg:w-96 ${showSidebar ? "flex" : "hidden"} md:flex flex-col`}>
+        
         <Sidebar
           onSelect={(id) => {
             setActiveChat(id);
@@ -75,7 +73,7 @@ export default function ChatPage() {
       {/* Chat area */}
       <div className={`flex-1 flex flex-col min-w-0 ${!showSidebar ? "flex" : "hidden"} md:flex`}>
         {activeChatId ? (
-          // CHANGED: ChatWindow now uses real chatId and Firestore messages
+          
           <ChatWindow
             chatId={activeChatId}
             onBack={() => { setActiveChat(null); setShowSidebar(true); }}
